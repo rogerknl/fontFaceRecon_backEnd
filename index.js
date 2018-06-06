@@ -17,6 +17,7 @@ app
 
 
 const port = process.env.PORT || 3000;
-app.listen(port);
-// eslint-disable-next-line
-console.log('Listening to %s', port);
+app.listen(port,()=>{
+  // eslint-disable-next-line
+  console.log('Listening to %s', port);
+});
