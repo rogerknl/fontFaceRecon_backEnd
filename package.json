@@ -1,0 +1,25 @@
+{
+  "name": "fontfacerec_server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js",
+    "test": "mocha"
+  },
+  "author": "Roger Canela",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^6.0.0",
+    "kcors": "^2.2.1",
+    "koa": "^2.5.1",
+    "koa-bodyparser": "^4.2.1",
+    "koa-logger": "^3.2.0",
+    "koa-router": "^7.4.0",
+    "puppeteer": "^1.4.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.17.5"
+  }
+}
