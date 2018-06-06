@@ -1,10 +1,10 @@
 'use strict';
 
-const fetchCondtroller = require('./controllers/fetch.controller.js');
+const fetchController = require('./controllers/fetch.controller.js');
 
 const router = require('koa-router')();
 
-router.get('/getStyles/:from', fetchCondtroller.get);
+router.get('/getStyles/', fetchController.getStyle);
 
 
 module.exports = router;

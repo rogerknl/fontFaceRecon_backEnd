@@ -1,5 +1,7 @@
+'use strict';
 
-module.exports.get = async (ctx, next) => {
-  ctx.status = 204;
+const puppeteer = require(__dirname + '/../services/puppet.js');
 
+module.exports.getStyle = async (ctx, next) => {
+  ctx.body = await puppeteer.puppetRequest(ctx.request.query.url,"options","options2");
 };
