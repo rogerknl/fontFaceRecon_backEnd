@@ -1,7 +1,7 @@
 'use stricts';
 const puppeteer = require('puppeteer');
 
-module.exports.puppetRequest = async (url,...args) => {
+module.exports.puppetRequest = async (url, ...args) => {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
   await page.goto(url);
@@ -14,13 +14,22 @@ module.exports.puppetRequest = async (url,...args) => {
       const result = [];
       const qr = document.querySelectorAll(str);
       for (let i = 0; i < qr.length; i++) {
-        result.push(qr[i].className);
-        //result.push(JSON.parse(JSON.stringify(getComputedStyle(qr[i]).getPropertyValue('font'))));
+        let uniq = true;
         const obj = JSON.parse(JSON.stringify(getComputedStyle(qr[i])));
-        result.push({
-          'font': obj['font'],
-          'textDecoration': obj['textDecoration']
-        });
+        for (let j = 0; (j < result.length) && (uniq); j++) {
+          if (
+            result[j].class === qr[i].className &&
+            result[j].font === obj.font &&
+            result[j].textDecoration === obj.textDecoration
+          ) uniq = false;
+        }
+        if (uniq) {
+          result.push({
+            'class': qr[i].className,
+            'font': obj['font'],
+            'textDecoration': obj['textDecoration']
+          });
+        }
       }
       return result;
     }
@@ -37,7 +46,7 @@ module.exports.puppetRequest = async (url,...args) => {
       b: getComputetOf('b'),
       span: getComputetOf('span')
     };
-  },args);
+  }, args);
 
   browser.close();
 
