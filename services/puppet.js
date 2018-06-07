@@ -4,11 +4,14 @@ const puppeteer = require('puppeteer');
 module.exports.puppetRequest = async (url, ...args) => {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
+  if ( url.slice(0,7) !== "http://" && url.slice(0,8) !== "https://") url = "https://" + url;
   await page.goto(url);
   await page.setViewport({
     width: 800,
     height: 600
   })
+  const img = await page.screenshot({type: 'jpeg'});
+  //await new Promise (resolve =>{setTimeout(resolve,2000)});
   const styles = await page.evaluate((test) => {
     const getComputetOf = (str) => {
       const result = [];
@@ -26,6 +29,8 @@ module.exports.puppetRequest = async (url, ...args) => {
         if (uniq) {
           result.push({
             'class': qr[i].className,
+            'fontFamily': obj['fontFamily'],
+            'color': obj['color'],
             'font': obj['font'],
             'textDecoration': obj['textDecoration']
           });
@@ -33,23 +38,21 @@ module.exports.puppetRequest = async (url, ...args) => {
       }
       return result;
     }
-    return {
-      body: getComputetOf('body'),
-      p: getComputetOf('p'),
-      h1: getComputetOf('h1'),
-      h2: getComputetOf('h2'),
-      h3: getComputetOf('h3'),
-      h4: getComputetOf('h4'),
-      h5: getComputetOf('h5'),
-      h6: getComputetOf('h6'),
-      a: getComputetOf('a'),
-      b: getComputetOf('b'),
-      span: getComputetOf('span')
-    };
+    return [
+      {body: getComputetOf('body')},
+      {div: getComputetOf('div')},
+      {p: getComputetOf('p')},
+      {h1: getComputetOf('h1')},
+      {h2: getComputetOf('h2')},
+      {h3: getComputetOf('h3')},
+      {h4: getComputetOf('h4')},
+      {h5: getComputetOf('h5')},
+      {h6: getComputetOf('h6')},
+      {a: getComputetOf('a')},
+      // {b: getComputetOf('b')},
+      {span: getComputetOf('span')}
+    ];
   }, args);
-
   browser.close();
-
-
-  return styles;
+  return [img.toString('base64'),styles];
 };
