@@ -1,10 +1,15 @@
 'use stricts';
 const puppeteer = require('puppeteer');
+const cache = require('./cache.js');
 
 module.exports.puppetRequest = async (url, ...args) => {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
   if ( url.slice(0,7) !== "http://" && url.slice(0,8) !== "https://") url = "https://" + url;
+  const cached = await cache.getCache(url);
+
+  if (cached) return JSON.parse(cached.data);
+
   await page.goto(url);
   await page.setViewport({
     width: 800,
@@ -54,5 +59,8 @@ module.exports.puppetRequest = async (url, ...args) => {
     ];
   }, args);
   browser.close();
-  return {img: img.toString('base64'),styles: styles};
+  const ret = JSON.stringify({img: img.toString('base64'),styles: styles});
+  cache.setCache(url,ret)
+
+  return ret;
 };
