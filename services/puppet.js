@@ -54,5 +54,5 @@ module.exports.puppetRequest = async (url, ...args) => {
     ];
   }, args);
   browser.close();
-  return [img.toString('base64'),styles];
+  return {img: img.toString('base64'),styles: styles};
 };
