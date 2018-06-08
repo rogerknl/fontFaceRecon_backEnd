@@ -82,6 +82,6 @@ module.exports.puppetRequest = async ( url ) => {
 
   //close browser, set object to the cache and send it to front-end
   browser.close();
-  //cache.setCache(url,ret)
+  cache.setCache(url,ret)
   return ret;
 };
