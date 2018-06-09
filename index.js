@@ -6,8 +6,8 @@ const logger = require('koa-logger');
 const cors = require('kcors');
 require('dotenv').config();
 
-const errorHandler = require('./middlewares/error-handler');
-const router = require('./routes.js');
+const errorHandler = require(__dirname+'/middlewares/error-handler');
+const router = require(__dirname+'/routes.js');
 
 app
 .use(logger())
