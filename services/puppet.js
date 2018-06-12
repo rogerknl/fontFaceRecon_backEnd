@@ -2,8 +2,11 @@
 const puppeteer = require('puppeteer');
 const cache = require('./cache.js');
 
+const puppet = {}
+
 //
-const getStyles = async ( page, ...tags ) => {
+puppet.getStyles = async ( page, ...tags ) => {
+  console.log("no hayria de printar aixo");
   //Call the function evaluate to be able to use DOM, tag selectors are in parameters
   return await page.evaluate( ( tags ) => {
 
@@ -54,13 +57,14 @@ const getStyles = async ( page, ...tags ) => {
   }, tags);
 }
 
-module.exports.puppetRequest = async ( url ) => {
+puppet.puppetRequest = async ( url ) => {
   //check if http or https is present and add if not
   if ( url.slice(0,7) !== "http://" && url.slice(0,8) !== "https://") url = "https://" + url;
 
   //check if url is cached
   const cached = await cache.getCache(url);
-  if (cached) return JSON.parse(cached.data);
+  if (cached) return cached.data;
+console.log("hola");
 
   //init chromium and go to the url
   const browser = await puppeteer.launch();
@@ -77,7 +81,7 @@ module.exports.puppetRequest = async ( url ) => {
 
   //get all desired styles and create object to be sended to de front-end
 
-  const styles = await getStyles(page,'body','h1','h2','h3','h4','h5','h6','p','a','span');
+  const styles = await puppet.getStyles(page,'body','h1','h2','h3','h4','h5','h6','p','a','span');
   const ret = JSON.stringify({img: img.toString('base64'),styles: styles});
 
   //close browser, set object to the cache and send it to front-end
@@ -85,3 +89,5 @@ module.exports.puppetRequest = async ( url ) => {
   cache.setCache(url,ret)
   return ret;
 };
+
+module.exports = puppet;
