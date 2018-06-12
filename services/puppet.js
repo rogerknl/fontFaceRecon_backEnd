@@ -58,6 +58,7 @@ puppet.getStyles = async ( page, ...tags ) => {
 
 puppet.puppetRequest = async ( url ) => {
   //check if http or https is present and add if not
+  url = url.toLowerCase();
   if ( url.slice(0,7) !== "http://" && url.slice(0,8) !== "https://") url = "https://" + url;
 
   //check if url is cached
