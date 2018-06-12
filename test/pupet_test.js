@@ -3,6 +3,7 @@ const assert =  require('chai').assert;
 var expect = require('chai').expect;
 const puppetOriginal = require('../services/puppet');
 const cacheOriginal = require('../services/cache');
+const puppeteer = require('puppeteer');
 const sinon = require('sinon');
 
 const cacheStub  =  {
@@ -12,9 +13,9 @@ const cacheStub  =  {
 
 const puppet = proxyquire('../services/puppet',{'./cache.js' : cacheStub});
 
-puppet.getStyles = sinon.stub()
 
-describe('Puppeter', function() {
+
+describe('Puppet', function() {
   it('If given URL hasnt https:// or http:// it has to add https:// ', async () => {
     cacheStub.getCache.returns(true);
     await puppet.puppetRequest('www.google.com/');
@@ -31,74 +32,59 @@ describe('Puppeter', function() {
     expect(cacheStub.getCache.calledWith('http://www.google.com/')).to.be.true; //comprobar que https http
   })
 
+  it('If url has not resolution it throws an error ', async () => {
+    cacheStub.getCache = cacheOriginal.getCache;
+    let pass;
+    try {
+      await puppet.puppetRequest('asdasd');
+      pass = false
+    } catch (e) {
+      pass = true;
+    }
+    expect(pass).to.be.true;
+  }).timeout(5000)
 
+  it('First time have to write result on cache ', async () => {
+    //clean cache
+    cacheOriginal.destroyAll();
 
+    //asign original cache methods to stub ones
+    cacheStub.getCache = cacheOriginal.getCache;
+    cacheStub.setCache = cacheOriginal.setCache;
 
-  // describe('puppetRequest', function(done) {
-    // describe('Handling url http/https',function() {
+    //create spyes to cache methods
+    let spyGet = sinon.spy(cacheStub, "getCache");
+    let spySet = sinon.spy(cacheStub, "setCache");
 
+    //call method to test
+    await puppet.puppetRequest('www.google.com');
 
-  //     it('If given URL has http it shldnt touch it', (done)=>{
-  //       cacheStub.getCache = (url) => {
-  //         return new Promise ( (resolve) =>{
-  //           resolve(
-  //             expect(url).to.be.equal("http://www.google.com/"));
-  //         }).then(() => done(), error => done(error));
-  //       };
-  //       puppet.getStyles = function (){
-  //       }
-  //       cacheStub.setCache = function () {
-  //       };
-  //        puppet.puppetRequest("http://www.google.com/");
-  //     });
+    //expect both cache spyes was called 1 time
+    expect(spyGet.callCount).to.equal(1);
+    expect(spySet.callCount).to.equal(1);
 
-  //     it('If given URL has not http||https it have to add https:// before it',  (done)=>{
-  //       cacheStub.getCache = (url) => {
-  //         return new Promise ( (resolve) =>{
-  //           resolve(
-  //             expect(url).to.be.equal("https://www.google.com/"));
-  //         }).then(() => done(), error => done(error));
-  //       };
+    //teardown spyes
+    cacheStub.getCache.restore();
+    cacheStub.setCache.restore();
+  }).timeout(5000)
 
-  //       cacheStub.setCache = function () {
-  //       };
-  //        puppet.puppetRequest("www.google.com/");
+  it('Second time have to return directly without do something more ', async () => {
+    //asign original cache methods to stub ones
+    cacheStub.getCache = cacheOriginal.getCache;
 
-  //     });
-  //   });
+    //create spyes to getCache and puppeteer.launch (first function after return)
+    let spyGet = sinon.spy(cacheStub, "getCache");
+    let spyLaunch = sinon.spy(puppeteer,'launch');
 
+    //call method to test
+    await puppet.puppetRequest('www.google.com');
 
-  //   describe ('If given URL incorrect or remote server is down:', function() {
-  //     it('If server is down on URL is not correct should throw an error', function() {
+    //expect getcache was called 1 time and 0 launch
+    expect(spyGet.callCount).to.equal(1);
+    expect(spyLaunch.callCount).to.equal(0);
 
-  //     });
-  //   });
-  //   describe ('If given URL correct:', function() {
-  //     it('If info is in the cache should be returned directly', async () => {
-  //       cacheStub.getCache = (url) => {
-  //         return new Promise ( (resolve) =>{resolve({data:'Mock cached data'})});
-  //       };
-
-  //       const res = await puppet.puppetRequest("www.google.com/")
-  //       expect(res).to.be.equal('Mock cached data');
-
-  //     });
-  //     this.timeout(10000);
-  //     describe('If info is not in the cache:', function() {
-  //       it('Connect to remote site and scrap the data, then return it and save it into cache', function() {
-  //         // cacheStub.getCache = (url) => {
-  //         // };
-  //         // await puppet.puppetRequest("www.google.com/");
-  //       });
-  //       it('Server is up but not responding, should throw an error ', async () =>{
-  //         await new Promise (resolve =>{setTimeout(resolve,4000)});
-  //         cacheStub.getCache = cacheOriginal.getCache;
-  //         cacheStub.setCache = cacheOriginal.setCache;
-  //         const res = await puppet.puppetRequest("www.google.com");
-  //         //console.log(res)
-
-  //       });
-  //     });
-  //   });
-  // });
+    //teardown spyes
+    cacheStub.getCache.restore();
+    puppeteer.launch.restore();
+  })
 });

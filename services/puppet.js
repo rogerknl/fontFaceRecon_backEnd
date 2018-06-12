@@ -6,7 +6,6 @@ const puppet = {}
 
 //
 puppet.getStyles = async ( page, ...tags ) => {
-  console.log("no hayria de printar aixo");
   //Call the function evaluate to be able to use DOM, tag selectors are in parameters
   return await page.evaluate( ( tags ) => {
 
@@ -64,7 +63,7 @@ puppet.puppetRequest = async ( url ) => {
   //check if url is cached
   const cached = await cache.getCache(url);
   if (cached) return cached.data;
-console.log("hola");
+
 
   //init chromium and go to the url
   const browser = await puppeteer.launch();
