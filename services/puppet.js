@@ -66,7 +66,7 @@ puppet.puppetRequest = async ( url ) => {
 
 
   //init chromium and go to the url
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch( {args: ['--no-sandbox', '--lang=es-ES,es','--disable-search-geolocation-disclosure']});
   const page = await browser.newPage();
   await page.setViewport({
     width: 1280,
